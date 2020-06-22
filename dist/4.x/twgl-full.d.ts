@@ -166,6 +166,7 @@ export type TextureOptions = {
     maxLod?: number;
     baseLevel?: number;
     maxLevel?: number;
+    maxAnisotropy?: number;
     unpackAlignment?: number;
     color?: number[] | ArrayBufferView;
     premultiplyAlpha?: number;

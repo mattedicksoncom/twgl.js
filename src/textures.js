@@ -118,6 +118,7 @@ const TEXTURE_MIN_LOD                = 0x813a;
 const TEXTURE_MAX_LOD                = 0x813b;
 const TEXTURE_BASE_LEVEL             = 0x813c;
 const TEXTURE_MAX_LEVEL              = 0x813d;
+const TEXTURE_MAX_ANISOTROPY_EXT     = 0x84FE;
 
 
 /* Pixel store */
@@ -539,6 +540,7 @@ function setDefaults(newDefaults) {
  * @property {number} [maxLod] TEXTURE_MAX_LOD setting
  * @property {number} [baseLevel] TEXTURE_BASE_LEVEL setting
  * @property {number} [maxLevel] TEXTURE_MAX_LEVEL setting
+ * @property {number} [maxAnisotropy] TEXTURE_MAX_ANISOTROPY_EXT setting
  * @property {number} [unpackAlignment] The `gl.UNPACK_ALIGNMENT` used when uploading an array. Defaults to 1.
  * @property {number[]|ArrayBufferView} [color] Color to initialize this texture with if loading an image asynchronously.
  *     The default use a blue 1x1 pixel texture. You can set another default by calling `twgl.setDefaults`
@@ -734,6 +736,9 @@ function setTextureSamplerParameters(gl, target, parameteriFn, options) {
   }
   if (options.maxLevel) {
     parameteriFn.call(gl, target, TEXTURE_MAX_LEVEL, options.maxLevel);
+  }
+  if (options.maxAnisotropy) {
+    parameteriFn.call(gl, target, TEXTURE_MAX_ANISOTROPY_EXT, options.maxAnisotropy);
   }
 }
 
