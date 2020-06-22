@@ -122,7 +122,7 @@ module.exports = function(grunt) {
           plugins: [
             ['@babel/plugin-transform-modules-commonjs', {loose: true}],
           ],
-        }
+        },
       },
     ],
   };
@@ -155,7 +155,7 @@ module.exports = function(grunt) {
         options: {
           destination: 'docs',
           configure: 'build/jsdoc.conf.json',
-          template: './node_modules/minami',
+          template: './build/jsdoc-template',
           outputSourceFiles: false,
         },
       },
@@ -241,7 +241,7 @@ module.exports = function(grunt) {
         ],
         format: 'es',
         indent: '  ',
-        banner: `/* ${getLicense(pkg)} */`,
+        banner: () => `/* ${getLicense(pkg)} */`,
       },
       files: {
         src: 'src/twgl-full.js',

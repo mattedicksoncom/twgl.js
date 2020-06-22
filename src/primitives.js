@@ -839,7 +839,7 @@ function createTruncatedConeVertices(
   const positions = createAugmentedTypedArray(3, numVertices);
   const normals   = createAugmentedTypedArray(3, numVertices);
   const texcoords = createAugmentedTypedArray(2, numVertices);
-  const indices   = createAugmentedTypedArray(3, radialSubdivisions * (verticalSubdivisions + extra) * 2, Uint16Array);
+  const indices   = createAugmentedTypedArray(3, radialSubdivisions * (verticalSubdivisions + extra / 2) * 2, Uint16Array);
 
   const vertsAroundEdge = radialSubdivisions + 1;
 
@@ -876,15 +876,23 @@ function createTruncatedConeVertices(
       const sin = Math.sin(ii * Math.PI * 2 / radialSubdivisions);
       const cos = Math.cos(ii * Math.PI * 2 / radialSubdivisions);
       positions.push(sin * ringRadius, y, cos * ringRadius);
-      normals.push(
-          (yy < 0 || yy > verticalSubdivisions) ? 0 : (sin * cosSlant),
-          (yy < 0) ? -1 : (yy > verticalSubdivisions ? 1 : sinSlant),
-          (yy < 0 || yy > verticalSubdivisions) ? 0 : (cos * cosSlant));
+      if (yy < 0) {
+        normals.push(0, -1, 0);
+      } else if (yy > verticalSubdivisions) {
+        normals.push(0, 1, 0);
+      } else if (ringRadius === 0.0) {
+        normals.push(0, 0, 0);
+      } else {
+        normals.push(sin * cosSlant, sinSlant, cos * cosSlant);
+      }
       texcoords.push((ii / radialSubdivisions), 1 - v);
     }
   }
 
   for (let yy = 0; yy < verticalSubdivisions + extra; ++yy) {  // eslint-disable-line
+    if (yy === 1 && topCap || yy === verticalSubdivisions + extra - 2 && bottomCap) {
+      continue;
+    }
     for (let ii = 0; ii < radialSubdivisions; ++ii) {  // eslint-disable-line
       indices.push(vertsAroundEdge * (yy + 0) + 0 + ii,
                    vertsAroundEdge * (yy + 0) + 1 + ii,
