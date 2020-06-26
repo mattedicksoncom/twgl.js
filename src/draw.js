@@ -119,7 +119,9 @@ function drawObjectList(gl, objectsToDraw) {
   let lastUsedProgramInfo = null;
   let lastUsedBufferInfo = null;
 
-  objectsToDraw.forEach(function(object) {
+  // objectsToDraw.forEach(function(object) {
+  for(let i = 0; i < objectsToDraw.length; i++) {
+    const object = objectsToDraw[i];
     if (object.active === false) {
       return;
     }
@@ -154,7 +156,8 @@ function drawObjectList(gl, objectsToDraw) {
 
     // Draw
     drawBufferInfo(gl, bufferInfo, type, object.count, object.offset, object.instanceCount);
-  });
+  // });
+  }
 
   if (lastUsedBufferInfo && lastUsedBufferInfo.vertexArrayObject) {
     gl.bindVertexArray(null);

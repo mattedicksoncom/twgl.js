@@ -1042,8 +1042,11 @@ function drawBufferInfo(gl, bufferInfo, type, count, offset, instanceCount) {
 
 function drawObjectList(gl, objectsToDraw) {
   var lastUsedProgramInfo = null;
-  var lastUsedBufferInfo = null;
-  objectsToDraw.forEach(function (object) {
+  var lastUsedBufferInfo = null; // objectsToDraw.forEach(function(object) {
+
+  for (var i = 0; i < objectsToDraw.length; i++) {
+    var object = objectsToDraw[i];
+
     if (object.active === false) {
       return;
     }
@@ -1076,8 +1079,8 @@ function drawObjectList(gl, objectsToDraw) {
 
     programs.setUniforms(programInfo, object.uniforms); // Draw
 
-    drawBufferInfo(gl, bufferInfo, type, object.count, object.offset, object.instanceCount);
-  });
+    drawBufferInfo(gl, bufferInfo, type, object.count, object.offset, object.instanceCount); // });
+  }
 
   if (lastUsedBufferInfo && lastUsedBufferInfo.vertexArrayObject) {
     gl.bindVertexArray(null);
@@ -1878,11 +1881,32 @@ function floatMat43Setter(gl, location) {
   return function (v) {
     gl.uniformMatrix4x3fv(location, false, v);
   };
-}
+} //HACK: assume it is webgl2
+
 
 function samplerSetter(gl, type, unit, location) {
   var bindPoint = getBindPointForSamplerType(gl, type);
-  return utils.isWebGL2(gl) ? function (textureOrPair) {
+  /*return utils.isWebGL2(gl) ? function(textureOrPair) {
+    let texture;
+    let sampler;
+    if (helper.isTexture(gl, textureOrPair)) {
+      texture = textureOrPair;
+      sampler = null;
+    } else {
+      texture = textureOrPair.texture;
+      sampler = textureOrPair.sampler;
+    }
+    gl.uniform1i(location, unit);
+    gl.activeTexture(TEXTURE0 + unit);
+    gl.bindTexture(bindPoint, texture);
+    gl.bindSampler(unit, sampler);
+  } : function(texture) {
+    gl.uniform1i(location, unit);
+    gl.activeTexture(TEXTURE0 + unit);
+    gl.bindTexture(bindPoint, texture);
+  };*/
+
+  return function (textureOrPair) {
     var texture;
     var sampler;
 
@@ -1898,10 +1922,6 @@ function samplerSetter(gl, type, unit, location) {
     gl.activeTexture(TEXTURE0 + unit);
     gl.bindTexture(bindPoint, texture);
     gl.bindSampler(unit, sampler);
-  } : function (texture) {
-    gl.uniform1i(location, unit);
-    gl.activeTexture(TEXTURE0 + unit);
-    gl.bindTexture(bindPoint, texture);
   };
 }
 
@@ -3344,7 +3364,21 @@ function setUniforms(setters, values) {
         setUniforms(actualSetters, _values[ii]);
       }
     } else {
-      for (var name in _values) {
+      // for (const name in values) {
+      //   const setter = actualSetters[name];
+      //   if (setter) {
+      //     setter(values[name]);
+      //   }
+      // }
+      var valuesArray = Object.keys(_values);
+
+      for (var _ii2 = 0; _ii2 < valuesArray.length; ++_ii2) {
+        var name = valuesArray[_ii2];
+
+        if (typeof name === 'undefined') {
+          continue;
+        }
+
         var setter = actualSetters[name];
 
         if (setter) {
@@ -3455,7 +3489,15 @@ function createAttributeSetters(gl, program) {
 
 
 function setAttributes(setters, buffers) {
-  for (var name in buffers) {
+  var bufferKeys = Object.keys(buffers); // for (const name in buffers) {
+  //   const setter = setters[name];
+  //   if (setter) {
+  //     setter(buffers[name]);
+  //   }
+  // }
+
+  for (var i = 0; i < bufferKeys.length; i++) {
+    var name = bufferKeys[i];
     var setter = setters[name];
 
     if (setter) {

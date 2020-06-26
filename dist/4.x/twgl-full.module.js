@@ -7054,13 +7054,13 @@ function floatMat43Setter(gl, location) {
     gl.uniformMatrix4x3fv(location, false, v);
   };
 }
-
+//HACK: assume it is webgl2
 function samplerSetter(gl, type, unit, location) {
   const bindPoint = getBindPointForSamplerType(gl, type);
-  return isWebGL2(gl) ? function(textureOrPair) {
+  /*return utils.isWebGL2(gl) ? function(textureOrPair) {
     let texture;
     let sampler;
-    if (isTexture(gl, textureOrPair)) {
+    if (helper.isTexture(gl, textureOrPair)) {
       texture = textureOrPair;
       sampler = null;
     } else {
@@ -7075,6 +7075,21 @@ function samplerSetter(gl, type, unit, location) {
     gl.uniform1i(location, unit);
     gl.activeTexture(TEXTURE0 + unit);
     gl.bindTexture(bindPoint, texture);
+  };*/
+  return function(textureOrPair) {
+    let texture;
+    let sampler;
+    if (isTexture(gl, textureOrPair)) {
+      texture = textureOrPair;
+      sampler = null;
+    } else {
+      texture = textureOrPair.texture;
+      sampler = textureOrPair.sampler;
+    }
+    gl.uniform1i(location, unit);
+    gl.activeTexture(TEXTURE0 + unit);
+    gl.bindTexture(bindPoint, texture);
+    gl.bindSampler(unit, sampler);
   };
 }
 
@@ -8190,7 +8205,18 @@ function setUniforms(setters, values) {  // eslint-disable-line
         setUniforms(actualSetters, values[ii]);
       }
     } else {
-      for (const name in values) {
+      // for (const name in values) {
+      //   const setter = actualSetters[name];
+      //   if (setter) {
+      //     setter(values[name]);
+      //   }
+      // }
+      const valuesArray = Object.keys(values);
+      for (let ii = 0; ii < valuesArray.length; ++ii) {
+        const name = valuesArray[ii];
+        if(typeof name === 'undefined') {
+          continue;
+        }
         const setter = actualSetters[name];
         if (setter) {
           setter(values[name]);
@@ -8295,7 +8321,15 @@ function createAttributeSetters(gl, program) {
  * @deprecated use {@link module:twgl.setBuffersAndAttributes}
  */
 function setAttributes(setters, buffers) {
-  for (const name in buffers) {
+  const bufferKeys = Object.keys(buffers);
+  // for (const name in buffers) {
+  //   const setter = setters[name];
+  //   if (setter) {
+  //     setter(buffers[name]);
+  //   }
+  // }
+  for (let i = 0; i < bufferKeys.length; i++) {
+    const name = bufferKeys[i];
     const setter = setters[name];
     if (setter) {
       setter(buffers[name]);
@@ -8595,7 +8629,9 @@ function drawObjectList(gl, objectsToDraw) {
   let lastUsedProgramInfo = null;
   let lastUsedBufferInfo = null;
 
-  objectsToDraw.forEach(function(object) {
+  // objectsToDraw.forEach(function(object) {
+  for(let i = 0; i < objectsToDraw.length; i++) {
+    const object = objectsToDraw[i];
     if (object.active === false) {
       return;
     }
@@ -8630,7 +8666,8 @@ function drawObjectList(gl, objectsToDraw) {
 
     // Draw
     drawBufferInfo(gl, bufferInfo, type, object.count, object.offset, object.instanceCount);
-  });
+  // });
+  }
 
   if (lastUsedBufferInfo && lastUsedBufferInfo.vertexArrayObject) {
     gl.bindVertexArray(null);
