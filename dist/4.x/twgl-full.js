@@ -1041,10 +1041,11 @@ function drawBufferInfo(gl, bufferInfo, type, count, offset, instanceCount) {
 
 
 function drawObjectList(gl, objectsToDraw) {
+  var maxLength = arguments.length > 2 && arguments[2] !== undefined ? arguments[2] : Number.MAX_SAFE_INTEGER;
   var lastUsedProgramInfo = null;
   var lastUsedBufferInfo = null; // objectsToDraw.forEach(function(object) {
 
-  for (var i = 0; i < objectsToDraw.length; i++) {
+  for (var i = 0; i < Math.min(objectsToDraw.length, maxLength); i++) {
     var object = objectsToDraw[i];
 
     if (object.active === false) {
@@ -1068,6 +1069,7 @@ function drawObjectList(gl, objectsToDraw) {
 
 
     if (bindBuffers || bufferInfo !== lastUsedBufferInfo) {
+      // console.log("switching");
       if (lastUsedBufferInfo && lastUsedBufferInfo.vertexArrayObject && !bufferInfo.vertexArrayObject) {
         gl.bindVertexArray(null);
       }

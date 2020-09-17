@@ -1435,7 +1435,7 @@ function setUniforms(setters, values) {  // eslint-disable-line
       const valuesArray = Object.keys(values);
       for (let ii = 0; ii < valuesArray.length; ++ii) {
         const name = valuesArray[ii];
-        if(typeof name === 'undefined') {
+        if (typeof name === 'undefined') {
           continue;
         }
         const setter = actualSetters[name];

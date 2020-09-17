@@ -115,12 +115,12 @@ function drawBufferInfo(gl, bufferInfo, type, count, offset, instanceCount) {
  * @param {DrawObject[]} objectsToDraw an array of objects to draw.
  * @memberOf module:twgl/draw
  */
-function drawObjectList(gl, objectsToDraw) {
+function drawObjectList(gl, objectsToDraw, maxLength = Number.MAX_SAFE_INTEGER) {
   let lastUsedProgramInfo = null;
   let lastUsedBufferInfo = null;
 
   // objectsToDraw.forEach(function(object) {
-  for(let i = 0; i < objectsToDraw.length; i++) {
+  for (let i = 0; i < Math.min(objectsToDraw.length, maxLength); i++) {
     const object = objectsToDraw[i];
     if (object.active === false) {
       return;
@@ -144,6 +144,7 @@ function drawObjectList(gl, objectsToDraw) {
 
     // Setup all the needed attributes.
     if (bindBuffers || bufferInfo !== lastUsedBufferInfo) {
+      // console.log("switching");
       if (lastUsedBufferInfo && lastUsedBufferInfo.vertexArrayObject && !bufferInfo.vertexArrayObject) {
         gl.bindVertexArray(null);
       }
